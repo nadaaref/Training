@@ -38,15 +38,3 @@ function ChooseDataBase {
   fi
 }
 
-function createDB {
-  echo -e "Enter Database Name: \c"
-  read DataBaseName
-  mkdir ./DBMS/$DataBaseName
-  if [[ $? == 0 ]]
-  then
-    echo "Database Created Successfully"
-  else
-    echo "Error Creating Database $DataBaseName"
-  fi
-  mainMenu
-}
