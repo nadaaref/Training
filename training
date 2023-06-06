@@ -1,0 +1,52 @@
+#!/bin/bash
+# A simple databases management system using Bash Shell
+mkdir DBMS 2>> ./.error.log
+clear
+echo "Welcome To Data Base Managemnt System"
+
+function mainMenu {
+  echo -e "\n+---------Main Menu-------------+"
+  echo "| 1. Select DB                  |"
+  echo "| 2. Create DB                  |"
+  echo "| 3. Rename DB                  |"
+  echo "| 4. Drop DB                    |"
+  echo "| 5. Show DBs                   |"
+  echo "| 6. Exit                       |"
+  echo "+-------------------------------+"
+  echo -e "Enter Choice: \c"
+  read ch
+  case $ch in
+    1)  ChooseDataBase ;;
+    2)  createDB ;;
+    3)  ChangeDBName ;;
+    4)  dropDB ;;
+    5)  ls ./DBMS ; mainMenu;;
+    6) exit ;;
+    *) echo " Wrong Choice " ; mainMenu;
+  esac
+}
+function ChooseDataBase {
+  echo -e "Enter Database Name: \c"
+  read DataBaseName
+  cd ./DBMS/$DataBaseName 2>>./.error.log
+  if [[ $? == 0 ]]; then
+    echo "Database $DataBaseName was Selected Successfuly"
+    tablesMenu
+  else
+    echo "Database $DataBaseName not found"
+    mainMenu
+  fi
+}
+
+function createDB {
+  echo -e "Enter Database Name: \c"
+  read DataBaseName
+  mkdir ./DBMS/$DataBaseName
+  if [[ $? == 0 ]]
+  then
+    echo "Database Created Successfully"
+  else
+    echo "Error Creating Database $DataBaseName"
+  fi
+  mainMenu
+}
