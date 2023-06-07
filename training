@@ -61,7 +61,8 @@ function ChangeDBName {
     echo "Error Renaming Database"
   fi
   mainMenu
-}function dropDB {
+}
+function dropDB {
   echo -e "Enter Database Name: \c"
   read DataBaseName
   rm -r ./DBMS/$DataBaseName 2>>./.error.log
