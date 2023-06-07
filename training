@@ -179,7 +179,62 @@ function dropTable{
   fi
   tablesMenu
 }
-function insert{}
+function insert
+ {
+  echo -e "Table Name: \c"
+  read tbName
+  if ! [[ -f $tbName ]]; then
+    echo "Table $tbName isn't existed ,choose another Table"
+    tablesMenu
+  fi
+  colsNum=`awk 'END{print NR}' .$tbName`
+  sep="|"
+  rSep="\n"
+  for (( i = 2; i <= $colsNum; i++ )); do
+    colName=$(awk 'BEGIN{FS="|"}{ if(NR=='$i') print $1}' .$tbName)
+    columnDataType=$( awk 'BEGIN{FS="|"}{if(NR=='$i') print $2}' .$tbName)
+    colKey=$( awk 'BEGIN{FS="|"}{if(NR=='$i') print $3}' .$tbName)
+    echo -e "$colName ($columnDataType) = \c"
+    read data
+ # Validate Input
+    if [[ $columnDataType == "int" ]]; then
+      while ! [[ $data =~ ^[0-9]*$ ]]; do
+        echo -e "invalid DataType !!"
+        echo -e "$colName ($columnDataType) = \c"
+        read data
+      done
+    fi
+
+    if [[ $colKey == "PK" ]]; then
+      while [[ true ]]; do
+        if [[ $data =~ ^[`awk 'BEGIN{FS="|" ; ORS=" "}{if(NR != 1)print $(('$i'-1))}' $tbName`]$ ]]; then
+          echo -e "invalid input for Primary Key !!"
+        else
+          break;
+        fi
+        echo -e "$colName ($columnDataType) = \c"
+        read data
+      done
+    fi
+
+    #Set row
+    if [[ $i == $colsNum ]]; then
+      row=$row$data$rSep
+    else
+       row=$row$data$sep
+    fi
+  done
+  echo -e $row"\c" >> $tbName
+  if [[ $? == 0 ]]
+  then
+    echo "Data Inserted Successfully"
+  else
+    echo "Error Inserting Data into Table $tbName"
+  fi
+  row=""
+  tablesMenu
+}
+
 function updateTable {
   echo -e "Enter Table Name: \c"
   read tName
@@ -279,8 +334,35 @@ function selectAll {
   selectMenu
 }
 
-function selectCol {}
-function selectCon {}
+function selectCol {
+  echo -e "Enter Table Name: \c"
+  read tName
+  echo -e "Enter Column Number: \c"
+  read colNum
+  awk 'BEGIN{FS="|"}{print $'$colNum'}' $tName
+  selectMenu
+}
+
+function selectCon {
+  echo -e "\n\n+--------Select Under Condition Menu-----------+"
+  echo "| 1. Select All Columns Matching Condition    |"
+  echo "| 2. Select Specific Column Matching Condition|"
+  echo "| 3. Back To Selection Menu                   |"
+  echo "| 4. Back To Main Menu                        |"
+  echo "| 5. Exit                                     |"
+  echo "+---------------------------------------------+"
+  echo -e "Enter Choice: \c"
+  read ch
+  case $ch in
+    1) clear; allCond ;;
+    2) clear; specCond ;;
+    3) clear; selectCon ;;
+    4) clear; cd ../.. 2>>./.error.log; mainMenu ;;
+    5) exit ;;
+    *) echo " Wrong Choice " ; selectCon;
+  esac
+}
+
 
 function allCond {
   echo -e "Select all columns from TABLE Where FIELD(OPERATOR)VALUE \n"
