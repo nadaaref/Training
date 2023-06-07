@@ -100,5 +100,70 @@ case $ch in
 esac
 
 }
+function createTable {
+  echo -e "Table Name: \c"
+  read tbName
+  if [[ -f $tbName ]]; then
+    echo "table already existed ,choose another name"
+    tablesMenu
+  fi
+  echo -e "Number of Columns: \c"
+  read colsNum
+  counter=1
+  sep="|"
+  rSep="\n"
+  pKey=""
+  metaData="Field"$sep"Type"$sep"key"
+  while [ $counter -le $colsNum ]
+  do
+    echo -e "Name of Column No.$counter: \c"
+    read colName
+
+    echo -e "Type of Column $colName: "
+    select var in "int" "str"
+    do
+      case $var in
+        int ) columnDataType="int";break;;
+        str ) columnDataType="str";break;;
+        * ) echo "Wrong Choice" ;;
+      esac
+    done
+    if [[ $pKey == "" ]]; then
+      echo -e "Make PrimaryKey ? "
+      select var in "yes" "no"
+      do
+        case $var in
+          yes ) pKey="PK";
+          metaData+=$rSep$colName$sep$columnDataType$sep$pKey;
+          break;;
+          no )
+          metaData+=$rSep$colName$sep$columnDataType$sep""
+          break;;
+          * ) echo "Wrong Choice" ;;
+        esac
+      done
+    else
+      metaData+=$rSep$colName$sep$columnDataType$sep""
+    fi
+    if [[ $counter == $colsNum ]]; then
+      temp=$temp$colName
+    else
+      temp=$temp$colName$sep
+    fi
+    ((counter++))
+  done
+  touch .$tbName
+  echo -e $metaData  >> .$tbName
+  touch $tbName
+  echo -e $temp >> $tbName
+  if [[ $? == 0 ]]
+  then
+    echo "Table Created Successfully"
+    tablesMenu
+  else
+    echo "Error Creating Table $tbName"
+    tablesMenu
+  fi
+}
 
 
