@@ -166,4 +166,6 @@ function createTable {
   fi
 }
 
-
+function dropTable{}
+function insert{}
+function updateTable{
